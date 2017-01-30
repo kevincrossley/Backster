@@ -4,7 +4,8 @@ clc; clear; close all;
 
 %% Import Data
 
-load Data1.mat %this should have once column 9 columns for each of the 5 sensors
+load quicktest.mat %this should have once column 9 columns for each of the 5 sensors
+Data1 = quicktest;
 [rows1,columns] = size(Data1);
 time = Data1(:,1);
 
@@ -36,8 +37,9 @@ sens = [sen3,sen4,sen5,sen6,sen7];
 
 
 %% Initial Variables
-sampleRate = .5;
-Beta = .5;
+sampleRate = .05;
+Beta = .001;
+Beta4 = .08;
 
 % link lengths (cm)
 l43 = 8;
@@ -66,26 +68,26 @@ origins = [0,1,0;       %from 4 to 7
 euler7 = ExScriptFun(sen7,sampleRate,Beta);
 euler6 = ExScriptFun(sen6,sampleRate,Beta);
 euler5 = ExScriptFun(sen5,sampleRate,Beta);
-euler4 = ExScriptFun(sen4,sampleRate,Beta);
+euler4 = ExScriptFun(sen4,sampleRate,Beta4);
 euler3 = ExScriptFun(sen3,sampleRate,Beta);
 
 for ii = 1:rows1
     
-    Re7 = eulerT(euler7(ii,3),euler7(ii,2),euler7(ii,1));
+    Re7 = eulerT(euler7(ii,3),euler7(ii,2),euler7(ii,1)); %Re = rotation matix euler
     Re6 = eulerT(euler6(ii,3),euler6(ii,2),euler6(ii,1));
     Re5 = eulerT(euler5(ii,3),euler5(ii,2),euler5(ii,1));
     Re4 = eulerT(euler4(ii,3),euler4(ii,2),euler4(ii,1));
     Re3 = eulerT(euler3(ii,3),euler3(ii,2),euler3(ii,1));
     
-    rpe7(ii,:) = Re7*[0;1;0];
+    rpe7(ii,:) = Re7*[0;1;0]; %rpe = relative position euler
     rpe6(ii,:) = Re6*[0;1;0];
     rpe5(ii,:) = Re5*[0;1;0];
     rpe4(ii,:) = Re4*[0;1;0];
     rpe3(ii,:) = Re3*[0;1;0];
 end
 
-pe0 = zeros(rows1,3);
-pe3 = rpe3 + pe0;
+pe0 = zeros(rows1,3); %pe = (absolute) position euler
+pe3 = pe0;%rpe3 + pe0;
 pe4 = rpe4 + pe3;
 pe7 = rpe7 + pe4;
 pe5 = rpe5 + pe7;
@@ -96,6 +98,27 @@ pe6 = rpe6 + pe7;
 
 
 %% Plot
+f0 = figure;
+plot(time, euler7(:,1), 'r');
+hold on
+plot(time, euler7(:,2), 'k');
+plot(time, euler7(:,3), 'b');
+title('Euler angles 7');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi X', '\theta Y', '\psi Z');
+hold off
+
+f2 = figure;
+plot(time, euler4(:,1), 'r');
+hold on
+plot(time, euler4(:,2), 'k');
+plot(time, euler4(:,3), 'b');
+title('Euler angles 4');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi X', '\theta Y', '\psi Z');
+hold off
 
 f1 = figure;
 pos = [pe3(1,:);pe4(1,:);pe7(1,:);pe6(1,:);pe7(1,:);pe5(1,:)];
@@ -112,14 +135,56 @@ grid on
 hold on
 
 p2 = plot3(pe7(1,1),pe7(1,3),pe7(1,2),'.-');
-set(p2,'MarkerSize',3,'LineWidth',.25,'Color',[.4,.7,1])
+set(p2,'MarkerSize',3,'LineWidth',.25,'Color',[.6,.1,.2])
+legend('marshall','sensor 7')
+
+p3 = plot3(pe4(1,1),pe4(1,3),pe4(1,2),'.-');
+set(p3,'MarkerSize',3,'LineWidth',.25,'Color',[.4,.7,1])
 legend('marshall','sensor 7')
 
 pause(.6)
-for i = 1:rows-1
+for i = 1:rows1-1
     pos = [pe3(i,:);pe4(i,:);pe7(i,:);pe6(i,:);pe7(i,:);pe5(i,:)];
     set(p1,'xData',pos(:,1),'yData',pos(:,3),'zData',pos(:,2))
     set(p2,'xData',pe7(1:i,1),'yData',pe7(1:i,3),'zData',pe7(1:i,2))
-    
-    pause(.025)
+    set(p3,'xData',pe4(1:i,1),'yData',pe4(1:i,3),'zData',pe4(1:i,2))
+    pause(.001)
 end
+
+
+
+
+
+
+figure('Name', 'Sensor Data');
+axis(1) = subplot(3,1,1);
+hold on;
+plot(time, gyr4(:,1), 'r');
+plot(time, gyr4(:,2), 'k');
+plot(time, gyr4(:,3), 'b');
+legend('X', 'Y', 'Z');
+xlabel('Time (s)');
+ylabel('Angular rate (deg/s)');
+title('Gyroscope');
+hold off;
+axis(2) = subplot(3,1,2);
+hold on;
+plot(time, acc4(:,1), 'r');
+plot(time, acc4(:,2), 'k');
+plot(time, acc4(:,3), 'b');
+legend('X', 'Y', 'Z');
+xlabel('Time (s)');
+ylabel('Acceleration (g)');
+title('Accelerometer');
+hold off;
+axis(3) = subplot(3,1,3);
+hold on;
+plot(time, mag4(:,1), 'r');
+plot(time, mag4(:,2), 'k');
+plot(time, mag4(:,3), 'b');
+legend('X', 'Y', 'Z');
+xlabel('Time (s)');
+ylabel('Flux (G)');
+title('Magnetometer');
+hold off;
+linkaxes(axis, 'x');
