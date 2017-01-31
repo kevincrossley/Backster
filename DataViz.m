@@ -4,8 +4,15 @@ clc; clear; close all;
 
 %% Import Data
 
-load quicktest.mat %this should have once column 9 columns for each of the 5 sensors
-Data1 = quicktest;
+load QT2.mat %this should have once column time, 9 columns for each of the 5 sensors
+Data2 = QT2;
+Data2(:,6) = 0;
+Data2(:,15) = 0;
+Data2(:,24) = 0;
+Data2(:,33) = 0;
+Data2(:,42) = 0;
+
+Data1 = Data2;
 [rows1,columns] = size(Data1);
 
 % assign variable names
@@ -93,8 +100,8 @@ for ii = 1:rows1 % for every time step
     % Caculate relative position of each sensor from initial position
     % rpe = relative position euler
     rpe7(ii,:) = Re7*[0;1;0]; 
-    rpe6(ii,:) = Re6*[0;1;0];
-    rpe5(ii,:) = Re5*[0;1;0];
+    rpe6(ii,:) = Re6*[.27;0;-.83];
+    rpe5(ii,:) = Re5*[.27;0;.83];
     rpe4(ii,:) = Re4*[0;1;0];
     rpe3(ii,:) = Re3*[0;1;0];
 end
@@ -126,16 +133,16 @@ ylabel('Angle (deg)');
 legend('\phi X', '\theta Y', '\psi Z');
 hold off
 
-f2 = figure;
-plot(time, euler4(:,1), 'r');
-hold on
-plot(time, euler4(:,2), 'k');
-plot(time, euler4(:,3), 'b');
-title('Euler angles 4');
-xlabel('Time (s)');
-ylabel('Angle (deg)');
-legend('\phi X', '\theta Y', '\psi Z');
-hold off
+% f2 = figure;
+% plot(time, euler4(:,1), 'r');
+% hold on
+% plot(time, euler4(:,2), 'k');
+% plot(time, euler4(:,3), 'b');
+% title('Euler angles 4');
+% xlabel('Time (s)');
+% ylabel('Angle (deg)');
+% legend('\phi X', '\theta Y', '\psi Z');
+% hold off
 
 % plot motion replay with p1 = stick figure
 % other plots = trace lines
@@ -149,25 +156,26 @@ zlim([-3,3]);
 xlabel x
 ylabel z
 zlabel y
-%view(90,0);
+view(0,90);
 grid on
 hold on
 
-p2 = plot3(pe7(1,1),pe7(1,3),pe7(1,2),'.-');
-set(p2,'MarkerSize',3,'LineWidth',.25,'Color',[.6,.1,.2])
-legend('marshall','sensor 7')
+sp2 = pe5;
+p2 = plot3(sp2(1,1),sp2(1,3),sp2(1,2),'.-');
+set(p2,'MarkerSize',3,'LineWidth',.25,'Color',[.1,.8,.3])
 
-p3 = plot3(pe4(1,1),pe4(1,3),pe4(1,2),'.-');
+sp3 = pe6;
+p3 = plot3(sp3(1,1),sp3(1,3),sp3(1,2),'.-');
 set(p3,'MarkerSize',3,'LineWidth',.25,'Color',[.4,.7,1])
-legend('marshall','sensor 7')
+legend('marshall','sensor 5','sensor 6')
 
 % Update replay plot with each step of data
 pause(.7)
 for i = 1:rows1-1
     pos = [pe3(i,:);pe4(i,:);pe7(i,:);pe6(i,:);pe7(i,:);pe5(i,:)];
     set(p1,'xData',pos(:,1),'yData',pos(:,3),'zData',pos(:,2))
-    set(p2,'xData',pe7(1:i,1),'yData',pe7(1:i,3),'zData',pe7(1:i,2))
-    set(p3,'xData',pe4(1:i,1),'yData',pe4(1:i,3),'zData',pe4(1:i,2))
+    set(p2,'xData',sp2(1:i,1),'yData',sp2(1:i,3),'zData',sp2(1:i,2))
+    set(p3,'xData',sp3(1:i,1),'yData',sp3(1:i,3),'zData',sp3(1:i,2))
     pause(.01)
 end
 
@@ -176,7 +184,7 @@ end
 
 
 % plot raw sensor data for one sensor
-figure('Name', 'Sensor Data');
+figure('Name', 'Sensor Data 7');
 axis(1) = subplot(3,1,1);
 hold on;
 plot(time, gyr7(:,1), 'r');
