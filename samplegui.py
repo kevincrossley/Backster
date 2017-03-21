@@ -12,7 +12,7 @@ class Backster(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
-        tk.Tk.wm_title(self, "Sea of BTC client")
+        tk.Tk.wm_title(self, "Backster v3.0")
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -25,6 +25,9 @@ class Backster(tk.Tk):
         frame1 = StartPage(container, self)
         self.frames[StartPage] = frame1
         frame1.grid(row=0, column=0, sticky="nsew")
+        frame1.config(bg="grey91")
+        frame1.grid_columnconfigure(0, weight=1)
+        frame1.grid_columnconfigure(5, weight=1)
 
         frame2 = PlotPage(container, self, frame1)
         self.frames[PlotPage] = frame2
@@ -182,9 +185,10 @@ class PlotPage(tk.Frame, StartPage):
         self.l4 = float(start_page.length4.get())
         self.l5 = float(start_page.length5.get())
 
-        button1 = ttk.Button(self, text="End Session",
+        button1 = tk.Button(self, text="End Session",
                              command=lambda: controller.end_screen())
         button1.pack()
+        button1.config(background="white")
 
         f = Figure(figsize=(7, 5), dpi=100)
         a = f.add_subplot(111)
@@ -197,8 +201,6 @@ class PlotPage(tk.Frame, StartPage):
         toolbar = NavigationToolbar2TkAgg(canvas, self)
         toolbar.update()
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-
 
 
 app = Backster()
