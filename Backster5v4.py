@@ -173,18 +173,16 @@ qv2to1 = np.array([0.0, l1, 0.0, 0.0])  # quaternion vector connecting 2 to 1
 qv3to2 = np.array([0.0, l2, 0.0, 0.0])
 qv4to3 = np.array([0.0, 0.0, 2.0, 2.0])
 qv5to3 = np.array([0.0, 0.0, -2.0, 2.0])
-qv6to3 = np.array([0.0, l5, 0.0, 0.0])
 
 # text file stuff
 file = open("DataLog1.txt", "w")
 
 # set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure(figsize=(7, 4), dpi=100)
-
 ax = p3.Axes3D(fig, [0, 0.05, 0.7, 0.95])
 
 # declare text line
-ax1 = fig.add_axes([0.75, 0.4, 0.2, 0.2])
+ax1 = fig.add_axes([0.74, 0.4, 0.22, 0.2])
 ax1.axis('off')  # removes all the lines
 
 # create rectangle for text
@@ -243,6 +241,7 @@ def boxCondition(condition):
         rect.set_facecolor([0.95, 0.75, 0.75])
     return
 
+
 # must connect to serial port
 # baud rate must match that of arduino
 ser = serial.Serial("/dev/cu.usbmodem1411", 9600)
@@ -257,8 +256,6 @@ line2, = ax.plot([], [], [], linewidth=4, color='k')
 line3, = ax.plot([], [], [], linewidth=4, color='k')
 # Line from 3 to 5
 line4, = ax.plot([], [], [], linewidth=4, color='k')
-# Line from 3 to 6
-line5, = ax.plot([], [], [], linewidth=4, color='k')
 
 
 # initialization function
@@ -268,15 +265,13 @@ def init():
     line2.set_data([], [])
     line3.set_data([], [])
     line4.set_data([], [])
-    line5.set_data([], [])
 
     line1.set_3d_properties([])
     line2.set_3d_properties([])
     line3.set_3d_properties([])
     line4.set_3d_properties([])
-    line5.set_3d_properties([])
 
-    return line1, line2, line3, line4, line5
+    return line1, line2, line3, line4
 
 
 # animation function: this is called sequentially
@@ -289,7 +284,7 @@ def animate(i):
 
     # create variables for each quaternion, and time
     time = float(split[0])
-    WriteCheck = 1  # float(split[25])
+    WriteCheck = 1  # float(split[21])
 
     # frame 1
     q1w = float(split[1])
@@ -316,11 +311,6 @@ def animate(i):
     q5x = float(split[18])
     q5y = float(split[19])
     q5z = float(split[20])
-    # frame 6
-    q6w = float(split[21])
-    q6x = float(split[22])
-    q6y = float(split[23])
-    q6z = float(split[24])
 
     # create arrays of each quaternion
     quat1 = np.array([q1w, q1x, q1y, q1z])
@@ -328,7 +318,6 @@ def animate(i):
     quat3 = np.array([q3w, q3x, q3y, q3z])
     quat4 = np.array([q4w, q4x, q4y, q4z])
     quat5 = np.array([q5w, q5x, q5y, q5z])
-    quat6 = np.array([q6w, q6x, q6y, q6z])
 
     # create unit vectors representing axes in local frame (for twist need z-axis of sensor 1)
     qvectz = np.array([0.0, 0.0, 0.0, 1.0])
@@ -336,7 +325,6 @@ def animate(i):
     # reinsert vectors on lines 13-17 here if you want to put them back where they were #
 
     # ----------- TRANSFORM UNIT VECTORS INTO GLOBAL FRAME FOR EACH SENSOR ----------- #
-
     # sensor 1
     nqvz1 = quatRotate(quat1, qvectz)  # New Quaternion representation of Vector X for sensor 1
 
@@ -345,7 +333,6 @@ def animate(i):
     nqv3to2 = quatRotate(quat3, qv3to2)
     nqv4to3 = quatRotate(quat4, qv4to3)
     nqv5to3 = quatRotate(quat5, qv5to3)
-    nqv6to3 = quatRotate(quat6, qv6to3)
 
     # -------------- CREATE RELATIVE POSITION POINTS -------------- #
 
@@ -367,9 +354,6 @@ def animate(i):
     skx53 = nqv5to3[1]  # SKeleton line, X point, sensor 5 to 3
     sky53 = nqv5to3[2]
     skz53 = nqv5to3[3]
-    skx63 = nqv6to3[1]  # SKeleton line, X point, sensor 5 to 3
-    sky63 = nqv6to3[2]
-    skz63 = nqv6to3[3]
 
     # -------------- CREATE OFFSETS AND ABSOLUTE POSITION POINTS -------------- #
 
@@ -394,10 +378,6 @@ def animate(i):
     line4.set_data([off3x, off3x + skx53], [off3y, off3y + sky53])
     line4.set_3d_properties([off3z, off3z + skz53])
 
-    # line connecting 3 to 6
-    line5.set_data([off3x, off3x + skx63], [off3y, off3y + sky63])
-    line5.set_3d_properties([off3z, off3z + skz63])
-
     # -------------- IF STATEMENTS TO CHECK FOR CONDITIONS -------------- #
 
     # back bend calculation
@@ -415,8 +395,9 @@ def animate(i):
     vtt2 = nqv2to1[1:4]
     toeAngle = np.arctan2(np.linalg.norm(np.cross(vtt1, vtt2)), np.dot(vtt1, vtt2)) * (180.0 / np.pi)
 
+
     if exercise == 'toeTouch':
-        ttext = 'Toe Touch' + ' = ' + str("%.2f" % toeAngle)
+        ttext = 'Toe Touch' + ' = ' + str("%.0f" % toeAngle) + u"\N{DEGREE SIGN}"
         if toeAngle < 50.0:  # make up some parameters
             line1.set_color([0.0, 0.6, 0.0])
             boxCondition('Yes')
@@ -426,7 +407,7 @@ def animate(i):
             boxCondition('No')
 
     elif exercise == 'backBend':
-        ttext = 'Back Bend' + ' = ' + str("%.2f" % bendAngle)
+        ttext = 'Back Bend' + ' = ' + str("%.0f" % bendAngle) + u"\N{DEGREE SIGN}"
         if bendAngle > 25.0 and bendAngle < 40.0:
             line2.set_color([0.0, 0.6, 0.0])
             boxCondition('Yes')
@@ -436,7 +417,7 @@ def animate(i):
             boxCondition('No')
 
     elif exercise == 'twist':
-        ttext = 'Twist' + ' = ' + str("%.2f" % twistAngle)
+        ttext = 'Twist' + ' = ' + str("%.0f" % twistAngle) + u"\N{DEGREE SIGN}"
 
         if abs(twistAngle) > 25.0:
             line3.set_color([0.0, 0.6, 0.0])
@@ -456,25 +437,22 @@ def animate(i):
     textbox.set_text(ttext)
 
     # writing text file
-
     # create strings of quaternions
     qraw1 = str(q1w) + ', ' + str(q1x) + ', ' + str(q1y) + ', ' + str(q1z)
     qraw2 = str(q2w) + ', ' + str(q2x) + ', ' + str(q2y) + ', ' + str(q2z)
     qraw3 = str(q3w) + ', ' + str(q3x) + ', ' + str(q3y) + ', ' + str(q3z)
     qraw4 = str(q4w) + ', ' + str(q4x) + ', ' + str(q4y) + ', ' + str(q4z)
     qraw5 = str(q5w) + ', ' + str(q5x) + ', ' + str(q5y) + ', ' + str(q5z)
-    qraw6 = str(q6w) + ', ' + str(q6x) + ', ' + str(q6y) + ', ' + str(q6z)
-    #combine raw quaternion string into one
-    writeQuat = qraw1 + ', ' + qraw2 + ', ' + qraw3 + ', ' + qraw4 + ', ' + qraw5 + ', ' + qraw6
+    # combine raw quaternion string into one
+    writeQuat = qraw1 + ', ' + qraw2 + ', ' + qraw3 + ', ' + qraw4 + ', ' + qraw5
 
     # create strings of raw position xyz points for each sensor
     raw1 = str(skx21) + ', ' + str(sky21) + ', ' + str(skz21)
     raw2 = str(skx21 + skx32) + ', ' + str(sky21 + sky32) + ', ' + str(skz21 + skz32)
     raw3 = str(off3x + skx43) + ', ' + str(off3y + sky43) + ', ' + str(off3z + skz43)
     raw4 = str(off3x + skx53) + ', ' + str(off3y + sky53) + ', ' + str(off3z + skz53)
-    raw5 = str(off3x + skx63) + ', ' + str(off3y + sky63) + ', ' + str(off3z + skz63)
     # combine raw data into one string
-    writeRaw = raw1 + ', ' + raw2 + ', ' + raw3 + ', ' + raw4 + ', ' + raw5
+    writeRaw = raw1 + ', ' + raw2 + ', ' + raw3 + ', ' + raw4
 
     # add time and "conditional" data
     writeVar = str(time) + ', ' + writeQuat + ', ' + writeRaw + \
@@ -486,7 +464,7 @@ def animate(i):
     elif WriteCheck == 0:
         x = 1
 
-    return line1, line2, line3, line4, line5
+    return line1, line2, line3, line4
 
 
 # Setting the axes properties
