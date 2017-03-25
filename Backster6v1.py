@@ -17,7 +17,7 @@ class Input(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
-        tk.Tk.wm_title(self, "Backster v3.0")
+        tk.Tk.wm_title(self, "Backster v4.0")
 
         container = tk.Frame(self)
         container.grid_rowconfigure(0, weight=1)
@@ -154,43 +154,127 @@ class Input(tk.Tk):
 
         return
 
-# ------------------ BEGIN SCRIPT ----------------- #
 
-# call user input gui
-user_in = Input()
-user_in.mainloop()
+def offsetAngle(samples):
+    qw1_init = 0
+    qx1_init = 0
+    qy1_init = 0
+    qz1_init = 0
+    qw2_init = 0
+    qx2_init = 0
+    qy2_init = 0
+    qz2_init = 0
+    qw3_init = 0
+    qx3_init = 0
+    qy3_init = 0
+    qz3_init = 0
+    qw4_init = 0
+    qx4_init = 0
+    qy4_init = 0
+    qz4_init = 0
+    qw5_init = 0
+    qx5_init = 0
+    qy5_init = 0
+    qz5_init = 0
+    qw6_init = 0
+    qx6_init = 0
+    qy6_init = 0
+    qz6_init = 0
 
-# read in values from user input GUI
-exercise = user_in.exercise.get()
-l1 = float(user_in.length1.get())
-l2 = float(user_in.length2.get())
-l3 = float(user_in.length3.get())
-l4 = float(user_in.length4.get())
-l5 = float(user_in.length5.get())
+    for i in range(0, samples):
+        data = ser.readline()
+        split_data = data.split()
+        qw1_init += float(split_data[1])
+        qx1_init += float(split_data[2])
+        qy1_init += float(split_data[3])
+        qz1_init += float(split_data[4])
+        qw2_init += float(split_data[5])
+        qx2_init += float(split_data[6])
+        qy2_init += float(split_data[7])
+        qz2_init += float(split_data[8])
+        qw3_init += float(split_data[9])
+        qx3_init += float(split_data[10])
+        qy3_init += float(split_data[11])
+        qz3_init += float(split_data[12])
+        qw4_init += float(split_data[13])
+        qx4_init += float(split_data[14])
+        qy4_init += float(split_data[15])
+        qz4_init += float(split_data[16])
+        qw5_init += float(split_data[17])
+        qx5_init += float(split_data[18])
+        qy5_init += float(split_data[19])
+        qz5_init += float(split_data[20])
+        qw6_init += float(split_data[21])
+        qx6_init += float(split_data[22])
+        qy6_init += float(split_data[23])
+        qz6_init += float(split_data[24])
 
-# create vectors representing line connecting each sensor
-qv2to1 = np.array([0.0, l1, 0.0, 0.0])  # quaternion vector connecting 2 to 1
-qv3to2 = np.array([0.0, l2, 0.0, 0.0])
-qv4to3 = np.array([0.0, 0.0, 2.0, 2.0])
-qv5to3 = np.array([0.0, 0.0, -2.0, 2.0])
-qv6to3 = np.array([0.0, l5, 0.0, 0.0])
+    qw1_init = qw1_init/100.0
+    qx1_init = qx1_init/100.0
+    qy1_init = qy1_init/100.0
+    qz1_init = qz1_init/100.0
+    qw2_init = qw2_init/100.0
+    qx2_init = qx2_init/100.0
+    qy2_init = qy2_init/100.0
+    qz2_init = qz2_init/100.0
+    qw3_init = qw3_init/100.0
+    qx3_init = qx3_init/100.0
+    qy3_init = qy3_init/100.0
+    qz3_init = qz3_init/100.0
+    qw4_init = qw4_init/100.0
+    qx4_init = qx4_init/100.0
+    qy4_init = qy4_init/100.0
+    qz4_init = qz4_init/100.0
+    qw5_init = qw5_init/100.0
+    qx5_init = qx5_init/100.0
+    qy5_init = qy5_init/100.0
+    qz5_init = qz5_init/100.0
+    qw6_init = qw6_init/100.0
+    qx6_init = qx6_init/100.0
+    qy6_init = qy6_init/100.0
+    qz6_init = qz6_init/100.0
 
-# text file stuff
-file = open("DataLog1.txt", "w")
+    # create arrays of each quaternion
+    quat1 = np.array([qw1_init, qx1_init, qy1_init, qz1_init])
+    quat2 = np.array([qw2_init, qx2_init, qy2_init, qz2_init])
+    quat3 = np.array([qw3_init, qx3_init, qy3_init, qz3_init])
+    quat4 = np.array([qw4_init, qx4_init, qy4_init, qz4_init])
+    quat5 = np.array([qw5_init, qx5_init, qy5_init, qz5_init])
+    quat6 = np.array([qw6_init, qx6_init, qy6_init, qz6_init])
 
-# set up the figure, the axis, and the plot element we want to animate
-fig = plt.figure(figsize=(7, 4), dpi=100)
+    # create skeleton line transformations
+    nqv2to1 = quatRotate(quat2, qv2to1)
+    nqv3to2 = quatRotate(quat3, qv3to2)
+    nqv4to3 = quatRotate(quat4, qv4to3)
+    nqv5to4 = quatRotate(quat5, qv5to4)
+    nqv6to4 = quatRotate(quat6, qv6to4)
 
-ax = p3.Axes3D(fig, [0, 0.05, 0.7, 0.95])
+    # create points for actual skeleton lines
+    skx21 = nqv2to1[1]  # SKeleton line, X point, sensor 2 to 1
+    sky21 = nqv2to1[2]
+    skz21 = nqv2to1[3]
+    skx32 = nqv3to2[1]  # SKeleton line, X point, sensor 3 to 2
+    sky32 = nqv3to2[2]
+    skz32 = nqv3to2[3]
+    skx43 = nqv4to3[1]  # SKeleton line, X point, sensor 4 to 3
+    sky43 = nqv4to3[2]
+    skz43 = nqv4to3[3]
+    skx54 = nqv5to4[1]  # SKeleton line, X point, sensor 5 to 3
+    sky54 = nqv5to4[2]
+    skz54 = nqv5to4[3]
+    skx64 = nqv6to4[1]  # SKeleton line, X point, sensor 5 to 3
+    sky64 = nqv6to4[2]
+    skz64 = nqv6to4[3]
 
-# declare text line
-ax1 = fig.add_axes([0.75, 0.4, 0.2, 0.2])
-ax1.axis('off')  # removes all the lines
+    # get 2d "heading" angles of the sensors along the spine
+    angle1 = np.arctan2(sky21, skx21)
+    angle2 = np.arctan2(sky32, skx32)
+    angle3 = np.arctan2(sky43, skx43)
 
-# create rectangle for text
-rect = patches.Rectangle((0, 0), 1, 1, fc=[1.0, 1.0, 1.0], linewidth=2.0, edgecolor=[0.0, 0.0, 0.0])
-ax1.add_patch(rect)
-textbox = plt.text(0.5, 0.5, "Initial", horizontalalignment='center', verticalalignment='center')
+    theta = (angle1 + angle2 + angle3)/3
+
+    return theta
+
 
 def quatRotate(q, va0q):
     vb0q = qmultiply(q, qmultiply(va0q, qconjugate(q)));
@@ -243,23 +327,6 @@ def boxCondition(condition):
         rect.set_facecolor([0.95, 0.75, 0.75])
     return
 
-# must connect to serial port
-# baud rate must match that of arduino
-ser = serial.Serial("/dev/cu.usbmodem1411", 9600)
-
-# -------------- SETUP LINE WIDTHS AND COLORS -------------- #
-
-# Line from 1 to 2
-line1, = ax.plot([], [], [], linewidth=4, color='k')
-# Line from 2 to 3
-line2, = ax.plot([], [], [], linewidth=4, color='k')
-# Line from 3 to 4
-line3, = ax.plot([], [], [], linewidth=4, color='k')
-# Line from 3 to 5
-line4, = ax.plot([], [], [], linewidth=4, color='k')
-# Line from 3 to 6
-line5, = ax.plot([], [], [], linewidth=4, color='k')
-
 
 # initialization function
 def init():
@@ -289,7 +356,7 @@ def animate(i):
 
     # create variables for each quaternion, and time
     time = float(split[0])
-    WriteCheck = 1  # float(split[25])
+    WriteCheck = float(split[25])
 
     # frame 1
     q1w = float(split[1])
@@ -344,8 +411,8 @@ def animate(i):
     nqv2to1 = quatRotate(quat2, qv2to1)
     nqv3to2 = quatRotate(quat3, qv3to2)
     nqv4to3 = quatRotate(quat4, qv4to3)
-    nqv5to3 = quatRotate(quat5, qv5to3)
-    nqv6to3 = quatRotate(quat6, qv6to3)
+    nqv5to4 = quatRotate(quat5, qv5to4)
+    nqv6to4 = quatRotate(quat6, qv6to4)
 
     # -------------- CREATE RELATIVE POSITION POINTS -------------- #
 
@@ -364,12 +431,12 @@ def animate(i):
     skx43 = nqv4to3[1]  # SKeleton line, X point, sensor 4 to 3
     sky43 = nqv4to3[2]
     skz43 = nqv4to3[3]
-    skx53 = nqv5to3[1]  # SKeleton line, X point, sensor 5 to 3
-    sky53 = nqv5to3[2]
-    skz53 = nqv5to3[3]
-    skx63 = nqv6to3[1]  # SKeleton line, X point, sensor 5 to 3
-    sky63 = nqv6to3[2]
-    skz63 = nqv6to3[3]
+    skx54 = nqv5to4[1]  # SKeleton line, X point, sensor 5 to 3
+    sky54 = nqv5to4[2]
+    skz54 = nqv5to4[3]
+    skx64 = nqv6to4[1]  # SKeleton line, X point, sensor 5 to 3
+    sky64 = nqv6to4[2]
+    skz64 = nqv6to4[3]
 
     # -------------- CREATE OFFSETS AND ABSOLUTE POSITION POINTS -------------- #
 
@@ -377,6 +444,9 @@ def animate(i):
     off3x = skx21 + skx32  # offset for sensor 3 lines' position in x direction
     off3y = sky21 + sky32
     off3z = skz21 + skz32
+    off4x = off3x + skx43
+    off4y = off3y + sky43
+    off4z = off3z + skz43
 
     # line connecting 1 to 2
     line1.set_data([0, skx21], [0, sky21])
@@ -390,32 +460,32 @@ def animate(i):
     line3.set_data([off3x, off3x + skx43], [off3y, off3y + sky43])
     line3.set_3d_properties([off3z, off3z + skz43])
 
-    # line connecting 3 to 5
-    line4.set_data([off3x, off3x + skx53], [off3y, off3y + sky53])
-    line4.set_3d_properties([off3z, off3z + skz53])
+    # line connecting 4 to 5
+    line4.set_data([off4x, off4x + skx54], [off4y, off4y + sky54])
+    line4.set_3d_properties([off4z, off4z + skz54])
 
-    # line connecting 3 to 6
-    line5.set_data([off3x, off3x + skx63], [off3y, off3y + sky63])
-    line5.set_3d_properties([off3z, off3z + skz63])
+    # line connecting 4 to 6
+    line5.set_data([off4x, off4x + skx64], [off4y, off4y + sky64])
+    line5.set_3d_properties([off4z, off4z + skz64])
 
     # -------------- IF STATEMENTS TO CHECK FOR CONDITIONS -------------- #
 
-    # back bend calculation
-    vbb = nqv2to1 + nqv3to2  # position of sensor 3 (2to1 + 3to2) - pos of sensor 1 (0,0,0)
+    # updated back bend included the new top sensor
+    vbb = nqv2to1 + nqv3to2 + nqv4to3  # position of sensor 4 (2to1 + 3to2 + 4to3) - pos of sensor 1 (0,0,0)
     bendAngle = np.arctan2(np.sqrt(vbb[1]**2 + vbb[2]**2), vbb[3]) * (180.0 / np.pi)
 
     # twist calculation
     vtw1 = [zx1, zy1, zz1]
-    # 5-4
-    vtw2 = [(off3x + skx53) - (off3x + skx43), (off3y + sky53) - (off3y + sky43), (off3z + skz53) - (off3z + skz43)]
+    # 6-5
+    vtw2 = [(off4x + skx64) - (off4x + skx54), (off4y + sky64) - (off4y + sky54), (off4z + skz64) - (off4z + skz54)]
     twistAngle = (np.arctan2(np.linalg.norm(np.cross(vtw1, vtw2)), np.dot(vtw1, vtw2)) * (180.0 / np.pi))
 
-    # toe touch calculation
-    vtt1 = nqv3to2[1:4]
+    # updated toe touch calculation to include the new top sensor
+    vtt1 = nqv4to3[1:4]  # uses 4to3 instead of 3to2 here
     vtt2 = nqv2to1[1:4]
     toeAngle = np.arctan2(np.linalg.norm(np.cross(vtt1, vtt2)), np.dot(vtt1, vtt2)) * (180.0 / np.pi)
 
-    if exercise == 'toeTouch':
+    if exercise == 'Toe Touch':
         ttext = 'Toe Touch' + ' = ' + str("%.2f" % toeAngle)
         if toeAngle < 50.0:  # make up some parameters
             line1.set_color([0.0, 0.6, 0.0])
@@ -425,7 +495,7 @@ def animate(i):
             line1.set_color([0.6, 0.0, 0.0])
             boxCondition('No')
 
-    elif exercise == 'backBend':
+    elif exercise == 'Back Bend':
         ttext = 'Back Bend' + ' = ' + str("%.2f" % bendAngle)
         if bendAngle > 25.0 and bendAngle < 40.0:
             line2.set_color([0.0, 0.6, 0.0])
@@ -435,7 +505,7 @@ def animate(i):
             line2.set_color([0.6, 0.0, 0.0])
             boxCondition('No')
 
-    elif exercise == 'twist':
+    elif exercise == 'Twist':
         ttext = 'Twist' + ' = ' + str("%.2f" % twistAngle)
 
         if abs(twistAngle) > 25.0:
@@ -471,10 +541,11 @@ def animate(i):
     raw1 = str(skx21) + ', ' + str(sky21) + ', ' + str(skz21)
     raw2 = str(skx21 + skx32) + ', ' + str(sky21 + sky32) + ', ' + str(skz21 + skz32)
     raw3 = str(off3x + skx43) + ', ' + str(off3y + sky43) + ', ' + str(off3z + skz43)
-    raw4 = str(off3x + skx53) + ', ' + str(off3y + sky53) + ', ' + str(off3z + skz53)
-    raw5 = str(off3x + skx63) + ', ' + str(off3y + sky63) + ', ' + str(off3z + skz63)
+    raw4 = str(off4x + skx54) + ', ' + str(off4y + sky54) + ', ' + str(off4z + skz54)
+    raw5 = str(off4x + skx64) + ', ' + str(off4y + sky64) + ', ' + str(off4z + skz64)
+    rawz = str(zx1) + ', ' + str(zy1) + ', ' + str(zz1)
     # combine raw data into one string
-    writeRaw = raw1 + ', ' + raw2 + ', ' + raw3 + ', ' + raw4 + ', ' + raw5
+    writeRaw = raw1 + ', ' + raw2 + ', ' + raw3 + ', ' + raw4 + ', ' + raw5 + ', ' + rawz
 
     # add time and "conditional" data
     writeVar = str(time) + ', ' + writeQuat + ', ' + writeRaw + \
@@ -489,17 +560,95 @@ def animate(i):
     return line1, line2, line3, line4, line5
 
 
-# Setting the axes properties
+# ------------------ INITIAL VALUES ----------------- #
 
+# # call user input gui
+# user_in = Input()
+# user_in.mainloop()
+#
+# # read in values from user input GUI
+# exercise = user_in.exercise.get()
+# l1 = float(user_in.length1.get())
+# l2 = float(user_in.length2.get())
+# l3 = float(user_in.length3.get())
+# l4 = float(user_in.length4.get())
+# l5 = float(user_in.length5.get())
+
+# if you don't want to use the GUI use these (cm)
+# exercise = "Free"
+# exercise = "Toe Touch"
+# exercise = "Back Bend"
+exercise = "Twist"
+l1 = 13.5
+l2 = 13
+l3 = 13.5
+l4 = 15
+l5 = 15
+
+# create vectors representing line connecting each sensor
+qv2to1 = np.array([0.0, l1, 0.0, 0.0])  # quaternion vector connecting 2 to 1
+qv3to2 = np.array([0.0, l2, 0.0, 0.0])
+qv4to3 = np.array([0.0, l3, 0.0, 0.0])
+qv5to4 = np.array([0.0, 0.0, l4, 0.0])
+qv6to4 = np.array([0.0, 0.0, -l5, 0.0])
+
+# set number of initialization samples
+samples = 20
+
+# text file stuff
+# for mocap, options are below, take them out of mocap2 folder and into this folder so they work
+# names subject to change during mocap visit based on order we do things
+# textvar = "0calibration.txt"
+# textvar = "1toetouch.txt"
+# textvar = "2backbend.txt"
+textvar = "3twist.txt"
+#textvar = "3twist.txt"
+
+# --------------------- SETUP --------------------- #
+
+file = open(textvar, "w")
+
+# set up the figure, the axis, and the plot element we want to animate
+fig = plt.figure(figsize=(7, 4), dpi=100)
+fig.suptitle("Backster" + u"\N{TRADE MARK SIGN}")
+
+ax = p3.Axes3D(fig, [0, 0.05, 0.7, 0.95])
+
+# declare text line
+ax1 = fig.add_axes([0.75, 0.4, 0.2, 0.2])
+ax1.axis('off')  # removes all the lines
+
+# create rectangle for text
+rect = patches.Rectangle((0, 0), 1, 1, fc=[1.0, 1.0, 1.0], linewidth=2.0, edgecolor=[0.0, 0.0, 0.0])
+ax1.add_patch(rect)
+textbox = plt.text(0.5, 0.5, "Initial", horizontalalignment='center', verticalalignment='center')
+
+# must connect to serial port
+# baud rate must match that of arduino
+ser = serial.Serial("/dev/cu.usbmodem1411", 9600)
+
+# -------------- SETUP LINE WIDTHS AND COLORS -------------- #
+
+# Line from 1 to 2
+line1, = ax.plot([], [], [], linewidth=4, color='k')
+# Line from 2 to 3
+line2, = ax.plot([], [], [], linewidth=4, color='k')
+# Line from 3 to 4
+line3, = ax.plot([], [], [], linewidth=4, color='k')
+# Line from 3 to 5
+line4, = ax.plot([], [], [], linewidth=4, color='k')
+# Line from 3 to 6
+line5, = ax.plot([], [], [], linewidth=4, color='k')
+
+# set axis labels
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
-ax.set_title('Backster' + u"\N{TRADE MARK SIGN}")
 
 # set axes limits
-ax.set_xlim3d([-10, 10])
-ax.set_ylim3d([-10, 10])
-ax.set_zlim3d([-10, 10])
+ax.set_xlim3d([-30, 30])
+ax.set_ylim3d([-30, 30])
+ax.set_zlim3d([-10, 50])
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, init_func=init,
                                frames=200, interval=20, blit=False)
