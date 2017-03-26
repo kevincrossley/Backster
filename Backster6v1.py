@@ -414,6 +414,16 @@ def animate(i):
     nqv5to4 = quatRotate(quat5, qv5to4)
     nqv6to4 = quatRotate(quat6, qv6to4)
 
+    # -------------- OFFSET RESULTS -------------- #
+
+    # get offset angle
+
+    # calculate Rotation matrix values based on offset angle
+    r1 = np.cos(theta)
+    r2 = -np.sin(theta)
+    r3 = np.sin(theta)
+    r4 = np.cos(theta)
+
     # -------------- CREATE RELATIVE POSITION POINTS -------------- #
 
     # First create the axes for all the sensors
@@ -437,6 +447,17 @@ def animate(i):
     skx64 = nqv6to4[1]  # SKeleton line, X point, sensor 5 to 3
     sky64 = nqv6to4[2]
     skz64 = nqv6to4[3]
+
+    skx21 = r1*skx21 + r2*sky21
+    sky21 = r3*skx21 + r4*sky21
+    skx32 = r1*skx32 + r2*sky32
+    sky32 = r3*skx32 + r4*sky32
+    skx43 = r1*skx43 + r2*sky43
+    sky43 = r3*skx43 + r4*sky43
+    skx54 = r1*skx54 + r2*sky54
+    sky54 = r3*skx54 + r4*sky54
+    skx64 = r1*skx64 + r2*sky64
+    sky64 = r3*skx64 + r4*sky64
 
     # -------------- CREATE OFFSETS AND ABSOLUTE POSITION POINTS -------------- #
 
@@ -649,6 +670,10 @@ ax.set_zlabel('Z')
 ax.set_xlim3d([-30, 30])
 ax.set_ylim3d([-30, 30])
 ax.set_zlim3d([-10, 50])
+
+# -------------- CALL OFFSET AND ANIMATION FUNCTIONS -------------- #
+
+theta = offsetAngle(samples)
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, init_func=init,
                                frames=200, interval=20, blit=False)
