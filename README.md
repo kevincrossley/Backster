@@ -4,11 +4,11 @@
 When you make a change to any of this code, when reuploading, commit changes as a new branch, not as the master. Only merge with the master when the new version is bug-free and completely ready to replace the old version
 
 ## Python & Arduino Code
-Use Backster5v4.py raw_data5.ino for 5 sensors
+Use Backster1Sensor.py & Backster1Sensor_Arduino.ino for 1 sensor
 
-Use Backster6v1.py raw_data6.ino for 6 sensors
+Use Backster6Sensors.py & Backster6Sensors_Arduino.ino or Backster6Sensors_Arduino_Bluetooth.ino for 6 sensors
 
-Use Gui testing.py to test python script without needing to read in from arduino
+Use Gui testing.py to test python script GUI without needing to read in from arduino
 
 ## Old Stuff
 ### Matlab Code Instructions
